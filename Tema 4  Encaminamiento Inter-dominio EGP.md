@@ -13,7 +13,7 @@ Internet está formado por diferentes Sistemas Autonomos interconectados, para e
 
 La información que un AS recibe debe ser retransmitida por todos sus routers frontera, sin variar el contenido de este mensaje de encaminamiento. Todos los BGP peers de un AS deben tener una sesión BGP entre ellos, dando lugar a una full mesh.
 
-![image-20191118214705778](D:\FIBQ7\XC2\t4BGP1)
+![imageBGP](t4BGP1)
 
 Los mensajes de iBGP son tratados como paquetes IP y retransmitidos normalmente .Los mensaje de iBGP y de eBGP son identicos. 
 
