@@ -25,12 +25,22 @@ Si es iBGP con una interfaz real cae la sesión BGP, en cambio si se usa una int
 
 Se utiliza TCP (port 179), iniciando la conexión con el three-way handshaking para establecer la conexión TCP. Una vez establecido el TCP y abierto el canal BGP se mandan los prefijos que que cada AS conoce, y quiere compartir. Las rutas BGP no tienen un tiempo de vida. Los updates BGP pueden enviar updates quitando rutas (withdraw). 
 
+Los estados por los que pasa la sesión BGP son:
+
+idle :arrow_right: connect :arrow_right:TCP Established :arrow_right: BGP open :arrow_right:Envio de updates
+
+Si hay time-out en el estado connect, se pasa a estado active.
+
 ### Base de datos BGP
 
 Un router BGP mantiene 3 BD con diferente información.
 
 * Adj-RIB_In: Todos los prefijos y atributos recibidos por sus peers.
-* Loc_RIB: Contiene la información de encaminamiento local, selecionando a través de su politica de encaminamiento. Con esta información se genera la tabla de encaminamiento.
+
+* Loc_RIB: Contiene la información de encaminamiento local, selecionando a través de su politica de encaminamiento. 
+
+  Con esta información se genera la tabla de encaminamiento.
+
 * Adj-RIB_Out: Todos los prejifos y atributos que este router anuncia a sus peers. Puede ser diferente según el vecino.
 
 ### Mensajes BGP
@@ -64,4 +74,32 @@ Marker: Seguridad, Lenght: Longitud BGP(cabecera + payload) y Type: (Open, Updat
   El Network Layer Reachability Information (NLRI) contiene la lista de prefijos anunciados por este peer, limitado por el tamaño maximo del mensaje BGP 4096 bytes.
 
   Se añaden 2 bytes para la longitud del estos campos. La longuitud del NLRI es el restante.
+  
+### Atributos BGP
+
+  Los atributos que se añaden a los mensajes de update son diversos, algunos son obligatorios:
+
+  * AS-PATH: Secuencia de números de AS por donde ha pasado un prefijo. Se usa para evitar bucles en las notificaciones de prefijos y para determinar el camino más corto (menor número de AS)
+
+  * Next-hop: Indica la @IP del router que hace de GW entre AS. Es el GW a nivel de AS.
+
+    ![image-20191125174046356](C:\Users\corre\Documents\FIB Q7\XC2\XC2\tBGP2)
+
+  * Next-hop third-party: Caso que haya un enlace directo sin sesión eBGP, sin next-hop los datagramas pasarían por un tercer AS. 
+
+  * Next-hop backdoor: Desacoplo del router BGP del router que procesa paquetes.
+
+  * ORIGIN: Determina como se ha aprendido un prefijo. Se añade al final del AS-PATH. Puede ser un '?' si esta información está incompleta, una 'i' si se ha aprendido por IGP o una 'e' si se ha aprendido por EGP (protocolo ya no utilizado de encaminamiento inter-AS).
+
+Otros atributos son opcionales:
+
+* Aggregator: Si un router sumariza prefijos se utiliza este atributo para indicar el RID del router y el AS donde se ha hecho.
+* Local preference: Se utiliza para manipular la selección del mejor camino, se escoje la ruta con valor mas alto. Por defecto el valor es 100.
+* Multi Exit Discriminator/MED/Metric: Se elige la ruta con metric más bajo. Los AS pueden recomendar al vecino cual usar, pero este puede elegir. Por defecto el valor es 0.
+
+### Algoritmo de Selección BGP
+
+Hay varios casos donde existen varias rutas para llegar a un destino y se establece un orden para los diferentes atributos BGP.
+
+  
 
