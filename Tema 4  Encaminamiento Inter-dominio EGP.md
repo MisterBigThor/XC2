@@ -83,7 +83,7 @@ Marker: Seguridad, Lenght: Longitud BGP(cabecera + payload) y Type: (Open, Updat
 
   * Next-hop: Indica la @IP del router que hace de GW entre AS. Es el GW a nivel de AS.
 
-    ![image-20191125174046356](C:\Users\corre\Documents\FIB Q7\XC2\XC2\tBGP2)
+    ![image-20191125174046356](tBGP2.jpg)
 
   * Next-hop third-party: Caso que haya un enlace directo sin sesión eBGP, sin next-hop los datagramas pasarían por un tercer AS. 
 
