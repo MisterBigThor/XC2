@@ -15,15 +15,15 @@ La información que un AS recibe debe ser retransmitida por todos sus routers fr
 
 ![imageBGP](t4BGP1.jpg)
 
-Los mensajes de iBGP son tratados como paquetes IP y retransmitidos normalmente .Los mensaje de iBGP y de eBGP son identicos. 
+Los mensajes de iBGP son tratados como paquetes IP y retransmitidos normalmente .Los mensaje de iBGP y de eBGP son identicos.
 
-Se debe usar una **interfaz virtual para los iBGP** y una **interfaz real para eBGP**. 
+Se debe usar una **interfaz virtual para los iBGP** y una **interfaz real para eBGP**.
 
 Si es iBGP con una interfaz real cae la sesión BGP, en cambio si se usa una interfaz virtual el protocolo de encaminamiento interno encontrara una nueva ruta y no caera esta sesión TCP. En el caso de eBGP debemos ver cuando se pierde una interfaz real entre AS.
 
 ### Sesión BGP
 
-Se utiliza TCP (port 179), iniciando la conexión con el three-way handshaking para establecer la conexión TCP. Una vez establecido el TCP y abierto el canal BGP se mandan los prefijos que que cada AS conoce, y quiere compartir. Las rutas BGP no tienen un tiempo de vida. Los updates BGP pueden enviar updates quitando rutas (withdraw). 
+Se utiliza TCP (port 179), iniciando la conexión con el three-way handshaking para establecer la conexión TCP. Una vez establecido el TCP y abierto el canal BGP se mandan los prefijos que que cada AS conoce, y quiere compartir. Las rutas BGP no tienen un tiempo de vida. Los updates BGP pueden enviar updates quitando rutas (withdraw).
 
 Los estados por los que pasa la sesión BGP son:
 
@@ -37,7 +37,7 @@ Un router BGP mantiene 3 BD con diferente información.
 
 * Adj-RIB_In: Todos los prefijos y atributos recibidos por sus peers.
 
-* Loc_RIB: Contiene la información de encaminamiento local, selecionando a través de su politica de encaminamiento. 
+* Loc_RIB: Contiene la información de encaminamiento local, selecionando a través de su politica de encaminamiento.
 
   Con esta información se genera la tabla de encaminamiento.
 
@@ -74,7 +74,7 @@ Marker: Seguridad, Lenght: Longitud BGP(cabecera + payload) y Type: (Open, Updat
   El Network Layer Reachability Information (NLRI) contiene la lista de prefijos anunciados por este peer, limitado por el tamaño maximo del mensaje BGP 4096 bytes.
 
   Se añaden 2 bytes para la longitud del estos campos. La longuitud del NLRI es el restante.
-  
+
 ### Atributos BGP
 
   Los atributos que se añaden a los mensajes de update son diversos, algunos son obligatorios:
@@ -85,7 +85,7 @@ Marker: Seguridad, Lenght: Longitud BGP(cabecera + payload) y Type: (Open, Updat
 
     ![ejemploBGPnextHop](tBGP2.jpg)
 
-  * Next-hop third-party: Caso que haya un enlace directo sin sesión eBGP, sin next-hop los datagramas pasarían por un tercer AS. 
+  * Next-hop third-party: Caso que haya un enlace directo sin sesión eBGP, sin next-hop los datagramas pasarían por un tercer AS.
 
   * Next-hop backdoor: Desacoplo del router BGP del router que procesa paquetes.
 
@@ -127,7 +127,7 @@ Si en la access-list no aparece un prefijo, por defecto se filtra (no aparece en
 
   * <u>1 conexion eBGP, otras preparadas</u>, entonces el router anuncia sus redes internas solamente a su BGP peer. Solo configura una ruta por defecto a este router. Si falla, se abre la otra sesión.
   * <u>Una conexión preferida, otras de backup abiertas siempre</u>. Usando MET para marcar la preferida y compartiendo los prefijos con todos los BGP peers.
-  * Hacer <u>balanceo de carga</u> usando los 2 o más routers. Dividiendo el anuncio de la mitad de los prefijos del Stub; en el otro sentido haciendo lo mismo pero general a todas las direcciones posibles. 
+  * Hacer <u>balanceo de carga</u> usando los 2 o más routers. Dividiendo el anuncio de la mitad de los prefijos del Stub; en el otro sentido haciendo lo mismo pero general a todas las direcciones posibles.
 
 * Multi-homed
 
