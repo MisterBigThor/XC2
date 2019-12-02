@@ -1,6 +1,6 @@
 # Encaminamiento Inter-dominio EGP
 
-Internet está formado por diferentes Sistemas Autonomos interconectados, para encaminar estos diferentes sistemas, entre ellos, se utilizan protocolos Exterior Gateway Protocol. En concreto veremos BGP; él usado en Internet, que está basado en vector-distancia.
+Internet está formado por diferentes Sistemas Autónomos interconectados, para encaminar estos diferentes sistemas, entre ellos, se utilizan protocolos Exterior Gateway Protocol. En concreto veremos BGP; él usado en Internet, que está basado en vector-distancia.
 
 ### Border Gateway Protocol
 
@@ -83,7 +83,7 @@ Marker: Seguridad, Lenght: Longitud BGP(cabecera + payload) y Type: (Open, Updat
 
   * Next-hop: Indica la @IP del router que hace de GW entre AS. Es el GW a nivel de AS.
 
-    ![image-20191125174046356](C:\Users\corre\Documents\FIB Q7\XC2\XC2\tBGP2)
+    ![ejemploBGPnextHop](tBGP2.jpg)
 
   * Next-hop third-party: Caso que haya un enlace directo sin sesión eBGP, sin next-hop los datagramas pasarían por un tercer AS. 
 
@@ -94,12 +94,51 @@ Marker: Seguridad, Lenght: Longitud BGP(cabecera + payload) y Type: (Open, Updat
 Otros atributos son opcionales:
 
 * Aggregator: Si un router sumariza prefijos se utiliza este atributo para indicar el RID del router y el AS donde se ha hecho.
-* Local preference: Se utiliza para manipular la selección del mejor camino, se escoje la ruta con valor mas alto. Por defecto el valor es 100.
-* Multi Exit Discriminator/MED/Metric: Se elige la ruta con metric más bajo. Los AS pueden recomendar al vecino cual usar, pero este puede elegir. Por defecto el valor es 0.
+* Local preference: Se utiliza para manipular la selección del mejor camino, se escoge la ruta con valor mas alto. Por defecto el valor es 100.
+* Multi Exit Discriminator/MED/Metric: Se elige la ruta con <u>metric</u> más bajo. Los AS pueden recomendar al vecino cual usar, pero este puede elegir. Por defecto el valor es 0.
 
 ### Algoritmo de Selección BGP
 
 Hay varios casos donde existen varias rutas para llegar a un destino y se establece un orden para los diferentes atributos BGP.
 
-  
+### Políticas sobre BGP [COMPLETAR]
 
+SCRIPTS CISCO:  
+
+Si en la access-list no aparece un prefijo, por defecto se filtra (no aparece en la tabla de encaminamiento, si en la de ADJRIB_In). En caso de querer usarlo, añadir un rout-map que acepte todo lo demás.
+
+[EJEMPLO POL2]
+
+### Escenarios Comunes en Internet
+
+* Stub
+
+  AS cliente, conectado a otro AS que le proporciona transito. En este caso se puede utilizar un numero de AS privado, sin pasar por IANA (hay traducción en el caso de que el AS quiera ir a Internet, donde solo caben los números AS públicos).
+
+  La tabla del BR del AS Stub, tendrá una ruta por defecto al router del AS provider
+
+* Stub multi-homed
+
+  AS con 2 o más conexiones, por seguridad, a un mismo AS (proveedor). Es posible que existan varios BR en cada frontera del AS.
+
+  [TODO:review this!]
+
+  Existen varias configuraciones posibles:
+
+  * <u>1 conexion eBGP, otras preparadas</u>, entonces el router anuncia sus redes internas solamente a su BGP peer. Solo configura una ruta por defecto a este router. Si falla, se abre la otra sesión.
+  * <u>Una conexión preferida, otras de backup abiertas siempre</u>. Usando MET para marcar la preferida y compartiendo los prefijos con todos los BGP peers.
+  * Hacer <u>balanceo de carga</u> usando los 2 o más routers. Dividiendo el anuncio de la mitad de los prefijos del Stub; en el otro sentido haciendo lo mismo pero general a todas las direcciones posibles. 
+
+* Multi-homed
+
+  AS que no proporciona tránsito, tiene 2 o más conexiones con diferentes AS proveedores, siendo él un cliente.
+
+  La configuración es igual que en Stub multi-homed, pero el router no debe dar transito entre los AS proveedores de forma explicita.
+
+* Transito
+
+  AS que tiene 2 o más conexiones con otros AS y proporciona transito entre ellos, según el contrato con los vecinos.
+
+### Route leaks
+
+[COMPLETAR]
