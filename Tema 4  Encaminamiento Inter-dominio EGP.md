@@ -142,3 +142,39 @@ Si en la access-list no aparece un prefijo, por defecto se filtra (no aparece en
 ### Route leaks
 
 [COMPLETAR]
+
+
+
+### BGP mejoras
+
+#### Comunidades
+
+Atributo opcional de BGP, abstracción de capa. Si hay un cambio en un AS cliente, con comunidades no es necesario que el proveedor cambie.
+
+Identificación de comunidades...
+
+[EJEMPLO COMUNITY]
+
+* Comunidades no-export 65535:65281 no puede anunciar el prefijo por sesión eBGP (iBGP si). Este prefijo solo se quedare dentro del AS pero este no lo retransmitirá.
+* Comunidades no-advertise, no anuncia el prefijo ni por eBGP ni iBGP.
+* Comunidades no-export-subconfed, no anunci a ningun otro router fuera del sub-AS.
+
+* [COMMUNITY STUB-MULTIHOMED]
+
+#### Escalabilidad iBGP
+
+Se necesita una conexión TCP por cada sesión de iBGP, con una malla completa entre todos los routers BGP dentro del AS. Para solucionar el problema de la malla completa se puede optar por:
+
+* Router reflection: Se divide el AS en clusters y en cada cluster se elige 1 o más <u>R</u>outer <u>R</u>eflector por cluster. Se necesitara un cluster-list (AS_PATH) y originator-id(identificador del creador del mensaje BGP).
+
+  Si un mensaje eBGP llega a un Router cliente este lo reenvia al RR de su cluster por iBGP.
+
+  Si un mensaje iBGP llega a un router cliente, este solo puede reenviarlo hacia fuera del AS.
+
+  Los RR deben reenviar todos los mensajes a todos excepto por donde ha venido.
+
+* Confederación de sub-AS: Se utilizan AS privados, dentro de estos si que tiene una malla completa. Los sub-AS deben tener una sesión eiBGP, tantas como sean necesarias. Desde fuera del AS este cambio no se ve ni se necesitan atributos adicionales.
+
+  [REGLAS eiBGP]
+
+  
