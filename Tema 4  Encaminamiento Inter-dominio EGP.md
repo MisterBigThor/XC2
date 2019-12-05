@@ -37,11 +37,9 @@ Un router BGP mantiene 3 BD con diferente información.
 
 * Adj-RIB_In: Todos los prefijos y atributos recibidos por sus peers.
 
-* Loc_RIB: Contiene la información de encaminamiento local, selecionando a través de su politica de encaminamiento.
+* Loc_RIB: Contiene la información de encaminamiento local, selecionando a través de su politica de encaminamiento. Con esta información se genera la tabla de encaminamiento.
 
-  Con esta información se genera la tabla de encaminamiento.
-
-* Adj-RIB_Out: Todos los prejifos y atributos que este router anuncia a sus peers. Puede ser diferente según el vecino.
+* Adj-RIB_Out: Todos los prefijos y atributos que este router anuncia a sus peers. Puede ser diferente según el vecino.
 
 ### Mensajes BGP
 
@@ -99,41 +97,75 @@ Otros atributos son opcionales:
 
 ### Algoritmo de Selección BGP
 
-Hay varios casos donde existen varias rutas para llegar a un destino y se establece un orden para los diferentes atributos BGP.
+Hay varios casos donde existen varias rutas para llegar a un destino y se establece un orden para los diferentes atributos BGP:
 
-### Políticas sobre BGP [COMPLETAR]
+1) Ruta con mayor local preference.
 
-SCRIPTS CISCO:  
+2) Ruta con menor AS-Path.
 
-Si en la access-list no aparece un prefijo, por defecto se filtra (no aparece en la tabla de encaminamiento, si en la de ADJRIB_In). En caso de querer usarlo, añadir un rout-map que acepte todo lo demás.
+3) IGP > EGP > incompleto.
 
-[EJEMPLO POL2]
+4) Ruta con menor metric.
 
-### Escenarios Comunes en Internet
+5) Ruta por eBGP antes que iBGP.
+
+6) 2 o + rutas iBGP, la de menor coste IGP.
+
+7) Ruta aprendida antes (más antigua).
+
+8) Ruta hacia el router con menor RID.
+
+9) Ruta hacia la interfaz de un mismo router con menor @IP.
+
+### Políticas sobre encaminamiento-Scripts CISCO
+
+Entre los AS puede existir una relacion peer to peer, o bien una relacion de costumer-provider.
+
+Las politicas se aplican usando varias herramientas de filtrado, aplicadas a los BGP updates.
+
+Los scripts de cisco se basan en 'route-map', a través de una lista de acceso.
+
+Se aplican las acciones correspondientes acciones, que actualizaran los BGP updates dependiendo si se aplican 'in' o 'out'.
+
+Los route-map tiene un else final donde no dejan passar nada que no se cumpla antes, se debe añadir un 'route-map permit' para dejar passar.
+
+![ejemploCISCO](ejemploCISCO.jpg)
+
+### Escenarios más Comunes
 
 * Stub
 
-  AS cliente, conectado a otro AS que le proporciona transito. En este caso se puede utilizar un numero de AS privado, sin pasar por IANA (hay traducción en el caso de que el AS quiera ir a Internet, donde solo caben los números AS públicos).
+  AS cliente, conectado a otro AS que le proporciona transito. En este caso se puede utilizar un numero de AS privado, sin pasar por IANA.
 
-  La tabla del BR del AS Stub, tendrá una ruta por defecto al router del AS provider
+  Hay traducción en el caso de que el AS quiera ir a Internet, donde solo caben los números AS públicos).
+
+  La tabla del BR del AS Stub, tendrá una ruta por defecto al router del AS proveedor.
 
 * Stub multi-homed
 
-  AS con 2 o más conexiones, por seguridad, a un mismo AS (proveedor). Es posible que existan varios BR en cada frontera del AS.
+  AS con 2 o más conexiones a un único AS, por seguridad, a un mismo AS (proveedor). Es posible que existan varios BR en cada frontera del AS.
 
-  [TODO:review this!]
+  No debe proporcionar transito entre los routers del otro AS.
 
   Existen varias configuraciones posibles:
 
-  * <u>1 conexion eBGP, otras preparadas</u>, entonces el router anuncia sus redes internas solamente a su BGP peer. Solo configura una ruta por defecto a este router. Si falla, se abre la otra sesión.
-  * <u>Una conexión preferida, otras de backup abiertas siempre</u>. Usando MET para marcar la preferida y compartiendo los prefijos con todos los BGP peers.
+  * <u>1 conexión eBGP, otras preparadas</u>, entonces el router anuncia sus redes internas solamente a su BGP peer. Solo configura una ruta por defecto a este router. Si falla, se abre la otra sesión.
+
+  * <u>Una conexión preferida, otras de backup abiertas siempre</u>. 
+
+    Anunciamos los prefijo y aplicamos MET en los router no preferido.
+
+    Los prefijos que entran, aplicamos local-preference < 100 a los prefijos del router no preferido.
+
   * Hacer <u>balanceo de carga</u> usando los 2 o más routers. Dividiendo el anuncio de la mitad de los prefijos del Stub; en el otro sentido haciendo lo mismo pero general a todas las direcciones posibles.
+
+    ![balanceoCarga](balanceo.jpg)
 
 * Multi-homed
 
-  AS que no proporciona tránsito, tiene 2 o más conexiones con diferentes AS proveedores, siendo él un cliente.
+  AS cliente, que no proporciona tránsito. Tiene 2 o más conexiones con diferentes AS proveedores.
 
-  La configuración es igual que en Stub multi-homed, pero el router no debe dar transito entre los AS proveedores de forma explicita.
+  Las configuraciones posibles son las mismas que en Stub multi-homed, pero el router no debe dar transito entre los AS proveedores de forma explicita.
 
 * Transito
 
@@ -141,7 +173,7 @@ Si en la access-list no aparece un prefijo, por defecto se filtra (no aparece en
 
 ### Route leaks
 
-[COMPLETAR]
+Si distribuimos accidentalmente o malintencionadamente prefijos, podemos provocar fallos en todo internet.	
 
 
 
@@ -149,32 +181,36 @@ Si en la access-list no aparece un prefijo, por defecto se filtra (no aparece en
 
 #### Comunidades
 
-Atributo opcional de BGP, abstracción de capa. Si hay un cambio en un AS cliente, con comunidades no es necesario que el proveedor cambie.
-
-Identificación de comunidades...
-
-[EJEMPLO COMUNITY]
+Atributo opcional de BGP, crea una capa de abstracción. Si hay un cambio de prefijos en un AS cliente, con comunidades no es necesario que el proveedor cambie. Las comunidades se identifican con #AS : #COMUNIDAD .
 
 * Comunidades no-export 65535:65281 no puede anunciar el prefijo por sesión eBGP (iBGP si). Este prefijo solo se quedare dentro del AS pero este no lo retransmitirá.
+
 * Comunidades no-advertise, no anuncia el prefijo ni por eBGP ni iBGP.
 * Comunidades no-export-subconfed, no anunci a ningun otro router fuera del sub-AS.
 
-* [COMMUNITY STUB-MULTIHOMED]
+
+Las comunidades en los casos de stub multi-homed se configuran:
+
+![image-20191205114309548](C:\Users\corre\Documents\FIB Q7\XC2\XC2\mhCOM.jpg)
 
 #### Escalabilidad iBGP
 
 Se necesita una conexión TCP por cada sesión de iBGP, con una malla completa entre todos los routers BGP dentro del AS. Para solucionar el problema de la malla completa se puede optar por:
 
-* Router reflection: Se divide el AS en clusters y en cada cluster se elige 1 o más <u>R</u>outer <u>R</u>eflector por cluster. Se necesitara un cluster-list (AS_PATH) y originator-id(identificador del creador del mensaje BGP).
+* <u>Router reflection</u>
 
-  Si un mensaje eBGP llega a un Router cliente este lo reenvia al RR de su cluster por iBGP.
+  Se divide el AS en clusters y en cada cluster se elige 1 o más <u>R</u>outer <u>R</u>eflector. Se necesitara un cluster-list (idem a AS_PATH) y originator-id (idem ORIGIN).
 
-  Si un mensaje iBGP llega a un router cliente, este solo puede reenviarlo hacia fuera del AS.
+  ![image-20191205114519091](C:\Users\corre\Documents\FIB Q7\XC2\XC2\rrIBGP.jpg)
 
-  Los RR deben reenviar todos los mensajes a todos excepto por donde ha venido.
+* <u>Confederación de sub-AS</u> 
 
-* Confederación de sub-AS: Se utilizan AS privados, dentro de estos si que tiene una malla completa. Los sub-AS deben tener una sesión eiBGP, tantas como sean necesarias. Desde fuera del AS este cambio no se ve ni se necesitan atributos adicionales.
+  ![image-20191205114629429](C:\Users\corre\Documents\FIB Q7\XC2\XC2\subAS.jpg)
 
-  [REGLAS eiBGP]
-
+  Se utilizan AS privados, dentro de estos si que tiene una malla completa. Los sub-AS deben tener una sesión eiBGP, tantas como sean necesarias. 
+  
+  Desde fuera del AS este cambio no se ve ni se necesitan atributos adicionales.
+  
+  
+  
   
