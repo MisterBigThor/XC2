@@ -99,23 +99,25 @@ Otros atributos son opcionales:
 
 Hay varios casos donde existen varias rutas para llegar a un destino y se establece un orden para los diferentes atributos BGP:
 
-1) Ruta con mayor local preference.
 
-2) Ruta con menor AS-Path.
 
-3) IGP > EGP > incompleto.
+1. Ruta con mayor local preference.
 
-4) Ruta con menor metric.
+2. Ruta con menor AS-Path.
 
-5) Ruta por eBGP antes que iBGP.
+3. IGP > EGP > incompleto. (atributo bgp ORIGIN)
 
-6) 2 o + rutas iBGP, la de menor coste IGP.
+4. Ruta con menor metric.
 
-7) Ruta aprendida antes (más antigua).
+5. Ruta aprendida por eBGP antes que iBGP.
 
-8) Ruta hacia el router con menor RID.
+6. 2 o + rutas iBGP, la de menor coste IGP.
 
-9) Ruta hacia la interfaz de un mismo router con menor @IP.
+7. Ruta aprendida antes (más antigua).
+
+8. Ruta hacia el router con menor RID.
+
+9. Ruta hacia la interfaz de un mismo router con menor @IP.
 
 ### Políticas sobre encaminamiento-Scripts CISCO
 
@@ -201,11 +203,11 @@ Se necesita una conexión TCP por cada sesión de iBGP, con una malla completa e
 
   Se divide el AS en clusters y en cada cluster se elige 1 o más <u>R</u>outer <u>R</u>eflector. Se necesitara un cluster-list (idem a AS_PATH) y originator-id (idem ORIGIN).
 
-  ![image-20191205114519091](C:\Users\corre\Documents\FIB Q7\XC2\XC2\rrIBGP.jpg)
+  ![clustering](rrIBGP.jpg)
 
 * <u>Confederación de sub-AS</u> 
 
-  ![image-20191205114629429](C:\Users\corre\Documents\FIB Q7\XC2\XC2\subAS.jpg)
+  ![subAS](subAS.jpg)
 
   Se utilizan AS privados, dentro de estos si que tiene una malla completa. Los sub-AS deben tener una sesión eiBGP, tantas como sean necesarias. 
   
