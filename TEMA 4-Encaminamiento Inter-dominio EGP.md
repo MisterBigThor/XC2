@@ -193,7 +193,8 @@ Atributo opcional de BGP, crea una capa de abstracción. Si hay un cambio de pre
 
 Las comunidades en los casos de stub multi-homed se configuran:
 
-![image-20191205114309548](C:\Users\corre\Documents\FIB Q7\XC2\XC2\mhCOM.jpg)
+![multihomedCOM](mhCOM.jpg)
+
 
 #### Escalabilidad iBGP
 
