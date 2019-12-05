@@ -195,6 +195,10 @@ Las comunidades en los casos de stub multi-homed se configuran:
 
 ![image-20191205114309548](C:\Users\corre\Documents\FIB Q7\XC2\XC2\mhCOM.jpg)
 
+Los routers utilizan la entrada del encaminamiento con @IP de mayor mascara. El AS200 será el que hará el balanceo de carga porque es el único que tiene las @IP con mascara /25 y hacia fuera anunciara la @IP con /24. 
+
+Por seguridad se anuncia entero el prefijo con mascara /24 por si uno de los dos enlaces cae.
+
 #### Escalabilidad iBGP
 
 Se necesita una conexión TCP por cada sesión de iBGP, con una malla completa entre todos los routers BGP dentro del AS. Para solucionar el problema de la malla completa se puede optar por:
