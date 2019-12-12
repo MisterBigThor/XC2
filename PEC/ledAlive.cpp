@@ -3,6 +3,7 @@
 
 ledAlive::ledAlive(int pin){
     pinLedAlive = pin;
+    pinMode(pin,OUTPUT);
     ledAliveStatus = 0;
 }
 
