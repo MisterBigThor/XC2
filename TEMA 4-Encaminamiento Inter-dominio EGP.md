@@ -218,6 +218,18 @@ Se necesita una conexión TCP por cada sesión de iBGP, con una malla completa e
   
   Desde fuera del AS este cambio no se ve ni se necesitan atributos adicionales.
   
+  ### Route Flap Damping
+  
+  Un route flap se produce anuncia y elimina uno o más prefijos o cambia el valor de los atributos constantemente (bgp Update -> consumo CPU, cortes servicio). Esto esta provocado por errores hardware/software, cables en mal estado, políticas contrapuestas.
+  
+  Los route flaps hacen que la convergencia sea más lenta entre routers BGP. Para solucionar este problema hay que ver cuando hay "demasiados" cambios y aplicamos penalidades:
+  
+  Creamos parámetros y reglas para controlar los flaps. [TODO REGLAS!]
+  
+  
+  
+  Se vio que este prefijo daba mas problemas que soluciones y los routers modernos ya podian soportar todos los route flaps. Se recomendó no usar esta solución en 2006. Actualmente(2013 a hoy) si se recomienda usarlo con valores de umbral más alto (6000).
+  
   
   
   
